@@ -4,7 +4,7 @@ from confluent_kafka import Producer
 import json
 import signal
 import sys
-from environment_loader import load_environment_variables
+from environment import load_environment_variables
 
 def initialize_kafka_producer():
     """
@@ -13,11 +13,11 @@ def initialize_kafka_producer():
     Returns:
         producer: The Kafka Producer object.
     """
-    load_environment_variables()
+    environment=load_environment_variables()
 
-    KAFKA_SERVER = f"{os.environ['KAFKA_IP']}:{os.environ['KAFKA_PORT']}"
-    KAFKA_USERNAME = os.environ.get("KAFKA_USERNAME")
-    KAFKA_PASSWORD = os.environ.get("KAFKA_PASSWORD")
+    KAFKA_SERVER = f"{environment['KAFKA_IP']}:{environment['KAFKA_PORT']}"
+    KAFKA_USERNAME = environment.get("KAFKA_USERNAME")
+    KAFKA_PASSWORD = environment.get("KAFKA_PASSWORD")
 
     producer_config = {
         "bootstrap.servers": KAFKA_SERVER,
