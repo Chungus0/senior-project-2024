@@ -1,0 +1,6 @@
+flask
+flask-cors
+confluent-kafka
+python-dotenv
+opencv-python
+numpy
