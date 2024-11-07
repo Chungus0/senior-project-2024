@@ -1,4 +1,4 @@
 opencv-python
 mediapipe
 confluent-kafka
-dotenv
+python-dotenv

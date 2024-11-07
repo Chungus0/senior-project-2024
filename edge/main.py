@@ -132,7 +132,7 @@ def main():
     """
     global cap, pose, mp_pose, mp_drawing, producer, KAFKA_TOPIC_VIDEO, KAFKA_TOPIC_POSE
 
-    KAFKA_TOPIC_VIDEO = "video-stream-laptop"
+    KAFKA_TOPIC_VIDEO = "video-stream-laptop-2"
     KAFKA_TOPIC_POSE = "pose-data-laptop"
 
     cap = initialize_video_capture()
