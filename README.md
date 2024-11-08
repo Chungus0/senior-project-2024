@@ -1,71 +1,245 @@
-# README
+# Backend
 
-## Overview
+---
 
-This project captures video from a webcam, uses MediaPipe to detect human poses, and streams both the video frames and pose data to Kafka topics. The purpose of this code is to provide real-time analysis of human poses while distributing the data for further processing or storage through a Kafka server.
+## Project Structure
 
-## How the Code Works
+- **`requirements.txt`**: Contains the list of Python dependencies required for the application.
+- **`.env`**: A file for storing environment variables such as Kafka configurations.
+- **`main.py`**: The entry point for the Flask application. It sets up routes and Kafka consumers to handle video streaming.
+- **`environment.py`**: A utility module for loading and managing environment variables securely.
 
-1. **Environment Setup**: The `environment_loader.py` script loads the necessary environment variables from a `.env` file. These variables include Kafka server configurations such as IP, port, username, and password.
-
-2. **Kafka Producer Initialization**: The Kafka producer is configured using the details loaded from the environment. If a username and password are provided, the producer is set up to authenticate with the Kafka server.
-
-3. **Webcam Capture**: The code uses OpenCV to capture video frames from the default webcam (index 0).
-
-4. **Pose Detection**: MediaPipe is used to process the video frames and detect pose landmarks. If pose landmarks are detected, they are drawn onto the frame for visualization.
-
-5. **Data Streaming to Kafka**:
-
-   - **Pose Data**: The detected pose landmarks are serialized into JSON and sent to the Kafka topic `pose-data-laptop`.
-   - **Video Frames**: The video frame with the drawn landmarks is encoded as a JPEG image and sent to the Kafka topic `video-stream-laptop`.
-
-6. **Graceful Shutdown**: The code handles signals (e.g., Ctrl+C) to ensure that resources like the webcam and Kafka producer are properly released before exiting.
+---
 
 ## Requirements
 
-To run the project, you will need the following Python packages, which are listed in `requirements.txt`:
+- Python 3.8+
+- Kafka Broker
+- Virtual environment (recommended)
 
-- `opencv-python`
-- `mediapipe`
-- `confluent-kafka`
-- `dotenv`
+---
 
-## How to Launch the Code
+## Setup Instructions
 
-1. **Clone the Repository**: First, clone this repository to your local machine.
-
-2. **Install Dependencies**:
-   Run the following command to install the required packages:
+1. **Clone the Repository**  
+   Clone this repository to your local machine:
 
    ```bash
+   git clone <repository_url>
+   cd <repository_name>
+   ```
+
+2. **Install Dependencies**  
+   Create a virtual environment (optional) and install the required Python libraries:
+
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate  # For Unix
+   venv\Scripts\activate     # For Windows
    pip install -r requirements.txt
    ```
 
-3. **Set Up Environment Variables**:
-   Create a `.env` file in the project root directory with the following content:
+3. **Configure Environment Variables**  
+   Create a `.env` file in the project root directory and add the following variables:
 
    ```env
-   KAFKA_IP=<Your Kafka Server IP>
-   KAFKA_PORT=<Your Kafka Server Port>
-   KAFKA_USERNAME=<Your Kafka Username>  # Optional
-   KAFKA_PASSWORD=<Your Kafka Password>  # Optional
+   KAFKA_IP=<Kafka broker IP>
+   KAFKA_PORT=<Kafka broker port>
+   KAFKA_USERNAME=<Kafka username (optional)>
+   KAFKA_PASSWORD=<Kafka password (optional)>
    ```
 
-   Replace `<Your Kafka Server IP>` and `<Your Kafka Server Port>` with the actual values for your Kafka server. If authentication is required, add the username and password.
+   Example:
 
-4. **Run the Code**:
-   Run the Python script using the following command:
+   ```env
+   KAFKA_IP=127.0.0.1
+   KAFKA_PORT=9092
+   KAFKA_USERNAME=admin
+   KAFKA_PASSWORD=admin123
+   ```
+
+4. **Run the Application**  
+   Start the Flask application:
    ```bash
    python main.py
    ```
-   This will start the video capture, process the frames for pose detection, and stream the data to Kafka.
+   The server will be accessible at `http://localhost:5000`.
 
-## Important Notes
+---
 
-- Ensure that the Kafka server is accessible and configured correctly.
-- If you encounter issues related to Kafka connectivity, double-check the environment variables and ensure that the Kafka server is up and running.
-- To gracefully stop the program, press `Ctrl+C`. This will ensure that all resources are properly cleaned up.
+## Key Features
 
-## License
+1. **Environment Variable Handling**:
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+   - Variables are securely loaded from the `.env` file using the `dotenv` package.
+   - Ensures the application doesn’t start without the necessary Kafka configurations.
+
+2. **Kafka Integration**:
+
+   - Uses `confluent_kafka` for robust Kafka consumer management.
+   - Supports secure communication with optional username/password authentication.
+
+3. **Real-Time Video Streaming**:
+   - Streams video frames from Kafka topics to the frontend using Flask routes.
+   - Provides frames in `multipart/x-mixed-replace` format for real-time updates.
+
+---
+
+## Example Usage
+
+- To stream video data from a Kafka topic:
+  - Visit the endpoint:
+    ```plaintext
+    http://localhost:5000/video_stream/<topic_name>
+    ```
+    Replace `<topic_name>` with the name of your Kafka topic.
+
+---
+
+## Troubleshooting
+
+- **Environment Variable Errors**:  
+  If you encounter errors related to `KAFKA_IP` or `KAFKA_PORT`, ensure these variables are correctly set in the `.env` file.
+- **Consumer Errors**:  
+  If Kafka consumers fail to connect or produce errors, check the Kafka broker status and ensure the topic exists.
+
+---
+
+# Cloud Server
+
+## Overview
+
+This setup provides a Kafka environment using Docker Compose with **Zookeeper** and **Kafka** services. It is optimized for low-latency, high-performance data streaming.
+
+---
+
+## Project Structure
+
+- **`docker-compose.yml`**: Defines the Zookeeper and Kafka services.
+
+---
+
+## Setup Instructions
+
+1. **Launch the Services**
+
+   ```bash
+   docker-compose up -d
+   ```
+
+2. **Verify the Setup**
+   ```bash
+   docker ps
+   ```
+   Confirm Zookeeper is on port `2181` and Kafka on `9092` (internal) / `29092` (external).
+
+---
+
+## Configuration Highlights
+
+- **Zookeeper**: Coordination service on port `2181`.
+- **Kafka**:
+  - Internal Listener: `localhost:9092`
+  - External Listener: `192.168.1.88:29092`
+  - Retention Policy: Data stored for 10 seconds (`KAFKA_LOG_RETENTION_MS`).
+
+---
+
+## Troubleshooting
+
+- Check logs for issues:
+  ```bash
+  docker-compose logs
+  ```
+- Verify Kafka connectivity:
+  ```bash
+  kafka-topics.sh --bootstrap-server localhost:9092 --list
+  ```
+
+---
+
+# Edge Device
+
+---
+
+## Project Structure
+
+- **`.env`**: Contains environment variables for Kafka configurations.
+- **`environment.py`**: Loads and manages environment variables.
+- **`main.py`**: The main script for video capture, pose detection, and data streaming.
+- **`requirements.txt`**: Lists the required Python packages.
+
+---
+
+## Requirements
+
+- Python 3.8+
+- A webcam
+- Kafka Broker
+
+---
+
+## Setup Instructions
+
+1. **Install Dependencies**  
+   Create a virtual environment (optional) and install the required libraries:
+
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate  # For Unix
+   venv\Scripts\activate     # For Windows
+   pip install -r requirements.txt
+   ```
+
+2. **Configure Environment Variables**  
+   Create a `.env` file in the project root with the following variables:
+
+   ```env
+   KAFKA_IP=<Kafka broker IP>
+   KAFKA_PORT=<Kafka broker port>
+   KAFKA_USERNAME=<Kafka username (optional)>
+   KAFKA_PASSWORD=<Kafka password (optional)>
+   ```
+
+   Example:
+
+   ```env
+   KAFKA_IP=127.0.0.1
+   KAFKA_PORT=9092
+   ```
+
+3. **Run the Application**  
+   Start the edge application:
+   ```bash
+   python main.py
+   ```
+
+---
+
+## Key Features
+
+1. **Pose Detection**:  
+   Uses MediaPipe to detect and extract pose landmarks from webcam video frames.
+
+2. **Kafka Integration**:  
+   Streams video frames and pose data to two Kafka topics:
+
+   - Video: `video-stream-laptop`
+   - Pose Data: `pose-data-laptop`
+
+3. **Efficient Processing**:  
+   Processes every 3rd frame to reduce load and encodes frames with reduced quality for smaller message sizes.
+
+---
+
+## Troubleshooting
+
+- **Environment Variables Missing**:  
+  Ensure the `.env` file is correctly set up.
+- **Kafka Connection Issues**:  
+  Verify the Kafka broker is running and accessible at the specified IP and port.
+
+- **Webcam Errors**:  
+  Ensure the webcam is properly connected and accessible by OpenCV.
+
+---
