@@ -1,0 +1,13 @@
+INFO:root:Namespace(batch_size=64, test_batch_size=1000, epochs=1, lr=0.001, gamma=0.5, no_cuda=False, dry_run=False, log_interval=2, save_model=True)
+INFO:root:Train Epoch: 1 [0/1168 (0%)]	Loss: 2.555934
+INFO:root:Train Epoch: 1 [128/1168 (11%)]	Loss: 2.256180
+INFO:root:Train Epoch: 1 [256/1168 (21%)]	Loss: 2.093472
+INFO:root:Train Epoch: 1 [384/1168 (32%)]	Loss: 1.857656
+INFO:root:Train Epoch: 1 [512/1168 (42%)]	Loss: 1.617493
+INFO:root:Train Epoch: 1 [640/1168 (53%)]	Loss: 1.577621
+INFO:root:Train Epoch: 1 [768/1168 (63%)]	Loss: 1.390262
+INFO:root:Train Epoch: 1 [896/1168 (74%)]	Loss: 1.382007
+INFO:root:Train Epoch: 1 [1024/1168 (84%)]	Loss: 1.328270
+INFO:root:Train Epoch: 1 [288/1168 (95%)]	Loss: 1.423744
+INFO:root:Test set: Average loss: 1.8930, Accuracy: 128/293 (43.69%)
+
